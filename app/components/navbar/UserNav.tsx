@@ -3,8 +3,12 @@
 import { CircleUserRound, Menu } from "lucide-react";
 import { useState } from "react";
 import MenuLink from "./MenuLink";
+import useLoginModal from "@/app/hooks/useLoginModal";
+import useSignupModal from "@/app/hooks/useSignupModal";
 
 const UserNav = () => {
+  const loginModal = useLoginModal();
+  const signupModal = useSignupModal()
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -26,12 +30,18 @@ const UserNav = () => {
       {isOpen && (
         <div className="cursor-pointer flex flex-col w-[220px] absolute top-[50px] right-0 bg-white border border-gray-300 rounded-xl shadow-md">
           <MenuLink
-            label="Register"
-            onClick={() => console.log("menu link clicked")}
+            label="Sign In"
+            onClick={() => {
+              setIsOpen(false);
+              loginModal.openModal();
+            }}
           />
           <MenuLink
-            label="Login"
-            onClick={() => console.log("menu link clicked")}
+            label="Sign Up"
+            onClick={() => {
+              setIsOpen(false);
+              signupModal.openModal();
+            }}
           />
         </div>
       )}
