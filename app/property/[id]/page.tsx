@@ -1,13 +1,16 @@
 import ReservationSideBar from "@/app/components/properties/ReservationSideBar";
+import apiService from "@/app/services/apiService";
 import Image from "next/image";
 
-const PropertyDetailPage = () => {
+const PropertyDetailPage = async ({ params }: { params: { id: string } }) => {
+  const property = await apiService.get("api/properties/" + params.id);
+
   return (
     <main className="pb-6 max-w-[1500px] mx-auto px-6">
       <div className="mb-4 w-full h-[64vh] overflow-hidden rounded-xl relative">
         <Image
           fill
-          src={"/properties/image (1).png"}
+          src={property.data.image_url}
           alt="Property Image"
           className="object-cover w-full h-full"
         />
@@ -15,16 +18,17 @@ const PropertyDetailPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="py-6 pr-6 col-span-3">
-          <h1 className="mb-4 text-4xl">Property Name</h1>
+          <h1 className="mb-4 text-4xl">{property.data.title}</h1>
           <span className="mb-6 block text-sm text-gray-600">
-            4 guests • 2 bedrooms • 2 beds • 1 bath
+            {property.data.guests} guests • {property.data.bedrooms} bedrooms •{" "}
+            {property.data.bathrooms} bathrooms
           </span>
 
           <hr />
 
           <div className="py-6 flex items-center space-x-4">
             <Image
-              src="/user.avif"
+              src={property.data.host.avatar_url || "/user.avif"}
               alt="User Avatar"
               width={50}
               height={50}
@@ -32,20 +36,21 @@ const PropertyDetailPage = () => {
             />
 
             <p>
-              <strong>Daddy</strong> is your host
+              <strong>{property.data.host.name}</strong> is your host
             </p>
           </div>
 
           <hr />
 
           <p className="mt-6 text-lg ">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quas,
-            atque nam voluptatum 
+            {property.data.description ||
+              "No description available for this property."}
           </p>
-
         </div>
 
-        <ReservationSideBar />
+        <ReservationSideBar
+          property={property.data}
+        />
       </div>
     </main>
   );
