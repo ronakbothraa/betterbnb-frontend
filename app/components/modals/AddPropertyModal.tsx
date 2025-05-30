@@ -6,10 +6,12 @@ import { useState } from "react";
 import AddPropertyCategories from "../addproperty/AddPropertyCategories";
 import Maps from "../maps/Maps";
 import Image from "next/image";
-import { X } from "lucide-react";
 import apiService from "@/app/services/apiService";
+import { useRouter } from "next/navigation";
 
 const AddPropertyModal = () => {
+  const router = useRouter();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [category, setCategory] = useState("");
 
@@ -24,7 +26,6 @@ const AddPropertyModal = () => {
     lng: number;
     address: string;
   } | null>(null);
-
   const [dataImage, setDataImage] = useState<File | null>(null);
 
   const setImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +63,24 @@ const AddPropertyModal = () => {
         "api/properties/create/",
         formData
       );
+
+      if (response.success) {
+        setCategory("");
+        setDataTitle("");
+        setDataDescription("");
+        setDataPrice("");
+        setDataBedrooms("");
+        setDataBathrooms("");
+        setDataGuests("");
+        setDataLocation(null);
+        setDataImage(null);
+        setCurrentStep(1);
+
+        addPropertyModal.closeModal();
+        router.refresh()
+      } else {
+        console.error("Failed to create property:", response.data);
+      }
     }
   };
 

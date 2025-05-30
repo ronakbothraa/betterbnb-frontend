@@ -4,8 +4,9 @@ import useLoginModal from "@/app/hooks/useLoginModal";
 import { Range } from "react-date-range";
 import { useEffect, useState } from "react";
 import DatePicker from "../Calendar";
-import { differenceInDays, addDays, format } from "date-fns";
+import { differenceInDays, addDays, format, eachDayOfInterval } from "date-fns";
 import apiService from "@/app/services/apiService";
+import { get } from "http";
 
 const initialDateRange = {
   startDate: new Date(),
@@ -38,6 +39,7 @@ const ReservationSideBar: React.FC<ReservationSideBarProps> = ({
   const [dateRange, setDateRange] = useState<Range>(initialDateRange);
   const [minDate, setMinDate] = useState<Date>(new Date());
   const [guests, setGuests] = useState<string>("1");
+  const [bookedDates, setBookedDates] = useState<Date[]>([]);
   const guestRange = Array.from({ length: property.guests }, (_, i) => i + 1);
 
   const performBooking = async () => {
@@ -82,7 +84,24 @@ const ReservationSideBar: React.FC<ReservationSideBarProps> = ({
     });
   };
 
+  const getReservations = async () => {
+    const reservations = await apiService.get(`api/properties/${property.id}/reservations/`)
+
+    let dates: Date[] = [];
+
+    reservations.data.forEach((element: any) => {
+      const range = eachDayOfInterval({
+        start: new Date(element.start_date),
+        end: new Date(element.end_date),
+      })
+
+      dates = [...dates, ...range]
+    });
+    setBookedDates(dates)
+  }
+
   useEffect(() => {
+    getReservations();
     if (dateRange.startDate && dateRange.endDate) {
       const nightsCount = differenceInDays(
         dateRange.endDate,
@@ -105,7 +124,7 @@ const ReservationSideBar: React.FC<ReservationSideBarProps> = ({
       <DatePicker
         value={dateRange}
         onChange={(ranges) => _setDateChange(ranges.selection)}
-        BookedDates={[]}
+        BookedDates={bookedDates}
       />
       <div className="mb-6 p-3 border border-gray-400 rounded-lg">
         <label htmlFor="checkin" className="mb-2 block font-bold text-xs">

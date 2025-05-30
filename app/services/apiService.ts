@@ -11,9 +11,9 @@ const apiService = {
       fetch(`${process.env.NEXT_PUBLIC_API_HOST}/${url}`, {
         method: "GET",
         headers: {
-          Accept: "application/json",
+          "Accept": "application/json",
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${accessToken}`,
         },
       })
         .then((response) => response.json())
