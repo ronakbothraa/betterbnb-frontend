@@ -2,6 +2,7 @@
 
 import useAddPropertyModal from "@/app/hooks/useAddPropertyModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
+import { CirclePlus } from "lucide-react";
 
 interface AddPropertyButtonProps {
   user?: string | null;
@@ -22,9 +23,10 @@ const AddPropertyButton: React.FC<AddPropertyButtonProps> = ({ user }) => {
   return (
     <div
       onClick={addProperty}
-      className="cursor-pointer p-2 text-sm font-semibold rounded-full hover:bg-gray-200"
+      className="flex flex-row items-center space-x-2 cursor-pointer p-3 text-sm font-semibold rounded-full hover:bg-gray-200"
     >
-      Add Property
+      <CirclePlus />
+      <div>Property</div>
     </div>
   );
 };

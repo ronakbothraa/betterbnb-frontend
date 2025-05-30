@@ -1,9 +1,11 @@
 import ReservationSideBar from "@/app/components/properties/ReservationSideBar";
+import { getAuthCookies } from "@/app/lib/actions";
 import apiService from "@/app/services/apiService";
 import Image from "next/image";
 
 const PropertyDetailPage = async ({ params }: { params: { id: string } }) => {
   const property = await apiService.get("api/properties/" + params.id);
+  const user = await getAuthCookies();
 
   return (
     <main className="pb-6 max-w-[1500px] mx-auto px-6">
@@ -48,9 +50,7 @@ const PropertyDetailPage = async ({ params }: { params: { id: string } }) => {
           </p>
         </div>
 
-        <ReservationSideBar
-          property={property.data}
-        />
+        <ReservationSideBar user={user} property={property.data} />
       </div>
     </main>
   );
