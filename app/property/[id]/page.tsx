@@ -2,9 +2,13 @@ import ReservationSideBar from "@/app/components/properties/ReservationSideBar";
 import { getAuthCookies } from "@/app/lib/actions";
 import apiService from "@/app/services/apiService";
 import Image from "next/image";
+import Link from "next/link";
 
 const PropertyDetailPage = async ({ params }: { params: { id: string } }) => {
   const property = await apiService.get("api/properties/" + params.id);
+
+  console.log("Property Detail Page ", property);
+
   const user = await getAuthCookies();
 
   return (
@@ -28,7 +32,7 @@ const PropertyDetailPage = async ({ params }: { params: { id: string } }) => {
 
           <hr />
 
-          <div className="py-6 flex items-center space-x-4">
+          <Link href={`/host/${property.data.host.id}`} className="py-6 flex items-center space-x-4">
             <Image
               src={property.data.host.avatar_url || "/user.avif"}
               alt="User Avatar"
@@ -40,7 +44,7 @@ const PropertyDetailPage = async ({ params }: { params: { id: string } }) => {
             <p>
               <strong>{property.data.host.name}</strong> is your host
             </p>
-          </div>
+          </Link>
 
           <hr />
 
