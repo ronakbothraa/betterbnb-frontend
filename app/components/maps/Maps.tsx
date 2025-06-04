@@ -21,9 +21,9 @@ const Maps: React.FC<MapsProps> = ({
   width = "100%",
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const markerRef = useRef<any>(null);
-  const autocompleteRef = useRef<any>(null);
+  const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   const [searchValue, setSearchValue] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
@@ -47,7 +47,10 @@ const Maps: React.FC<MapsProps> = ({
         if (mapRef.current) {
           // Initialize map using google.maps.Map
           const map = new google.maps.Map(mapRef.current, {
-            center: { lat: defaultLocation?.lat || 28.704059, lng: defaultLocation?.lng || 77.102490 },
+            center: {
+              lat: defaultLocation?.lat || 28.704059,
+              lng: defaultLocation?.lng || 77.10249,
+            },
             zoom: 13,
             mapTypeControl: false,
             streetViewControl: false,
@@ -221,7 +224,9 @@ const Maps: React.FC<MapsProps> = ({
       <div
         ref={mapRef}
         style={{ height, width }}
-        className="rounded-lg border border-gray-300 shadow-sm"
+        className={`${
+          !isLoaded && "hidden"
+        } rounded-lg border border-gray-300 shadow-sm`}
       />
 
       {/* Loading State */}
@@ -236,7 +241,6 @@ const Maps: React.FC<MapsProps> = ({
           </div>
         </div>
       )}
-
     </div>
   );
 };

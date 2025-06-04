@@ -1,28 +1,45 @@
 import Image from "next/image";
 import apiService from "../services/apiService";
-import { difference } from "next/dist/build/utils";
 import { differenceInDays } from "date-fns";
 import Link from "next/link";
 
+// Add interfaces for type safety
+interface Property {
+  id: string;
+  title: string;
+  image_url: string;
+}
+
+interface Reservation {
+  id: string;
+  start_date: string;
+  end_date: string;
+  total_price: number;
+  property: Property;
+}
+
 const ReservationPage = async () => {
-  const reservations = await apiService.get("/api/auth/reservations");
+  const reservations: Reservation[] = await apiService.get("/api/auth/reservations");
   console.log(reservations);
+  
   return (
-    <div className="max-w-[1500px] max-auto px-6 pb-6">
+    <div className="max-w-[1500px] mx-auto px-6 pb-6"> {/* Fixed: max-auto -> mx-auto */}
       <div className="my-6">
-        <h1 className="text-2xl">My reservation</h1>
+        <h1 className="text-2xl">My Reservations</h1> {/* Fixed: reservation -> Reservations */}
       </div>
-      {reservations.map((reservation: any) => (
-        <div key={reservation.id}>
-          <div className="space-y-4">
+      
+      {reservations && reservations.length > 0 ? (
+        reservations.map((reservation: Reservation) => (
+          <div key={reservation.id} className="mb-4">
             <div className="p-5 grid grid-cols-1 md:grid-cols-4 gap-4 shadow-md rounded-xl border border-gray-300">
-              <div className="col-span-1 ">
+              <div className="col-span-1">
                 <div className="relative overflow-hidden rounded-xl aspect-square">
                   <Image
                     fill
-                    alt="Property Image"
-                    src={`${reservation.property.image_url}`}
+                    alt={`${reservation.property.title} property image`}
+                    src={reservation.property.image_url}
                     className="hover:scale-110 object-cover transition h-full w-full"
+                    sizes="(max-width: 768px) 100vw, 25vw"
                   />
                 </div>
               </div>
@@ -31,25 +48,24 @@ const ReservationPage = async () => {
                   <h2 className="mb-4 text-xl">{reservation.property.title}</h2>
                   <p>
                     <strong>Check-in date: </strong>
-                    {reservation.start_date}
+                    {new Date(reservation.start_date).toLocaleDateString()}
                   </p>
                   <p>
                     <strong>Check-out date: </strong>
-                    {reservation.end_date}
+                    {new Date(reservation.end_date).toLocaleDateString()}
                   </p>
-
                   <p>
-                    <strong>number of nights: </strong>
+                    <strong>Number of nights: </strong>
                     {differenceInDays(
-                      reservation.start_date,
-                      reservation.end_date
+                      new Date(reservation.end_date),
+                      new Date(reservation.start_date)
                     )}{" "}
                     nights
                   </p>
                   <hr />
                   <p>
                     <strong>Total Price: </strong>
-                    {reservation.total_price}
+                    ₹{reservation.total_price.toLocaleString()}
                   </p>
                 </div>
 
@@ -62,8 +78,18 @@ const ReservationPage = async () => {
               </div>
             </div>
           </div>
+        ))
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-gray-500">No reservations found.</p>
+          <Link 
+            href="/" 
+            className="mt-4 inline-block py-2 px-4 bg-airbnb hover:bg-airbnb-dark transition rounded-lg text-white"
+          >
+            Browse Properties
+          </Link>
         </div>
-      ))}
+      )}
     </div>
   );
 };

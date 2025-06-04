@@ -1,69 +1,144 @@
-import { resolve } from "path";
 import { getAccessToken } from "../lib/actions";
 
+// Define generic response type
+type ApiResponse<T = unknown> = T;
+
+// Define request data types
+type RequestData = Record<string, unknown> | FormData | null;
+
 const apiService = {
-  get: async function (url: string): Promise<any> {
+  get: async function <T = unknown>(url: string): Promise<ApiResponse<T>> {
     console.log(`GET request to ${url}`);
 
     const accessToken = await getAccessToken();
 
-    return new Promise((resolve, reject) => {
-      fetch(`${process.env.NEXT_PUBLIC_API_HOST}/${url}`, {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/${url}`, {
         method: "GET",
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
+          ...(accessToken && { "Authorization": `Bearer ${accessToken}` }),
         },
-      })
-        .then((response) => response.json())
-        .then((json) => {
-          console.log("Response data: ", json);
-          resolve(json);
-        })
-        .catch((error) => {
-          console.error("Error in GET request: ", error);
-          reject(error);
-        });
-    });
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const json = await response.json();
+      console.log("Response data: ", json);
+      return json;
+    } catch (error) {
+      console.error("Error in GET request: ", error);
+      throw error;
+    }
   },
 
-  post: async function (url: string, data: any): Promise<any> {
+  post: async function <T = unknown>(url: string, data: RequestData): Promise<ApiResponse<T>> {
+    console.log(`POST request to ${url}`);
     
     const accessToken = await getAccessToken();
 
-    let request;
-    {
-      accessToken
-        ? (request = {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${accessToken}`,
-            },
-            body: data,
-          })
-        : (request = {
-            method: "POST",
-            headers: {
-              "Accept": "application/json",
-              "Content-Type": "application/json",
-            },
-            body: data ? JSON.stringify(data) : null,
-        });
+    // Determine if data is FormData or needs JSON stringification
+    const isFormData = data instanceof FormData;
+    
+    const headers: Record<string, string> = {
+      ...(accessToken && { "Authorization": `Bearer ${accessToken}` }),
+    };
+
+    // Only add Content-Type for non-FormData requests
+    if (!isFormData) {
+      headers["Accept"] = "application/json";
+      headers["Content-Type"] = "application/json";
     }
 
-    return new Promise((resolve, reject) => {
-      fetch(`${process.env.NEXT_PUBLIC_API_HOST}/${url}`, request)
-        .then((response) => response.json())
-        .then((json) => {
-          console.log("Response data: ", json);
-          resolve(json);
-        })
-        .catch((error) => {
-          console.error("Error in POST request: ", error);
-          reject(error);
-        });
-    });
+    const requestOptions: RequestInit = {
+      method: "POST",
+      headers,
+      body: isFormData ? data : (data ? JSON.stringify(data) : null),
+    };
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/${url}`, requestOptions);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const json = await response.json();
+      console.log("Response data: ", json);
+      return json;
+    } catch (error) {
+      console.error("Error in POST request: ", error);
+      throw error;
+    }
+  },
+
+  put: async function <T = unknown>(url: string, data: RequestData): Promise<ApiResponse<T>> {
+    console.log(`PUT request to ${url}`);
+    
+    const accessToken = await getAccessToken();
+
+    const isFormData = data instanceof FormData;
+    
+    const headers: Record<string, string> = {
+      ...(accessToken && { "Authorization": `Bearer ${accessToken}` }),
+    };
+
+    if (!isFormData) {
+      headers["Accept"] = "application/json";
+      headers["Content-Type"] = "application/json";
+    }
+
+    const requestOptions: RequestInit = {
+      method: "PUT",
+      headers,
+      body: isFormData ? data : (data ? JSON.stringify(data) : null),
+    };
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/${url}`, requestOptions);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const json = await response.json();
+      console.log("Response data: ", json);
+      return json;
+    } catch (error) {
+      console.error("Error in PUT request: ", error);
+      throw error;
+    }
+  },
+
+  delete: async function <T = unknown>(url: string): Promise<ApiResponse<T>> {
+    console.log(`DELETE request to ${url}`);
+
+    const accessToken = await getAccessToken();
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/${url}`, {
+        method: "DELETE",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          ...(accessToken && { "Authorization": `Bearer ${accessToken}` }),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const json = await response.json();
+      console.log("Response data: ", json);
+      return json;
+    } catch (error) {
+      console.error("Error in DELETE request: ", error);
+      throw error;
+    }
   },
 };
 
