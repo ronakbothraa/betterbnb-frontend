@@ -1,3 +1,4 @@
+import HostContact from "@/app/components/HostContact";
 import PropertyList from "@/app/components/properties/PropertyList";
 import { getAuthCookies } from "@/app/lib/actions";
 import apiService from "@/app/services/apiService";
@@ -19,7 +20,6 @@ interface PageParams {
 }
 
 const HostDetailPage = async ({ params }: PageParams) => {
-  // Fix: Await params since it's now a Promise in Next.js 15
   const { id } = await params;
 
   // Validate params.id early
@@ -73,12 +73,9 @@ const HostDetailPage = async ({ params }: PageParams) => {
 
               {/* More robust user comparison with proper type checking */}
               {user && typeof user === "string" && user !== id && (
-                <button
-                  className="cursor-pointer mt-6 py-3 px-6 bg-airbnb text-white rounded-xl hover:bg-airbnb-dark transition focus:outline-none focus:ring-2 focus:ring-airbnb focus:ring-offset-2"
-                  aria-label={`Contact ${host.name || host.email}`}
-                >
-                  Contact
-                </button>
+                <HostContact
+                  host_id={host.id} 
+                />
               )}
             </div>
           </aside>

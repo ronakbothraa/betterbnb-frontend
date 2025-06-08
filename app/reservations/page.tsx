@@ -19,7 +19,8 @@ interface Reservation {
 }
 
 const ReservationPage = async () => {
-  const reservations: Reservation[] = await apiService.get("/api/auth/reservations");
+
+  const reservations: Reservation[] = await apiService.get("api/auth/reservations");
   console.log(reservations);
   
   return (

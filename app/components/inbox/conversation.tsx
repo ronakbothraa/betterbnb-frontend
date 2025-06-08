@@ -10,6 +10,7 @@ interface ConversationProps {
 
 const Conversation: React.FC<ConversationProps> = ({ conversation, user }) => {
   const router = useRouter();
+  
   const otherUser = conversation.user.find((u) => u.id !== user);
 
   return (

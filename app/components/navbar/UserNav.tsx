@@ -70,6 +70,13 @@ const UserNav: React.FC<UserNavProps> = ({ user }) => {
                   router.push("/reservations");
                 }}
               />
+              <MenuLink
+                label="My Inbox"
+                onClick={() => {
+                  setIsOpen(false)
+                  router.push("/inbox");
+                }}
+              />
               <LogoutButton />
             </>
           )}
